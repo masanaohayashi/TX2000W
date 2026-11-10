@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<JUCERPROJECT id="pCpVsR" name="TX2000W" projectType="audioplug" useAppConfig="0"
+              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" version="0.3.0"
+              bundleIdentifier="tokyo.studio-r.tx2000w" pluginFormats="buildAUv3,buildStandalone,buildVST3"
+              companyName="STUDIO-R" companyCopyright="2026 STUDIO-R" companyWebsite="http://studio-r.tokyo"
+              pluginCharacteristicsValue="pluginIsSynth,pluginProducesMidiOut,pluginWantsMidiIn"
+              pluginManufacturerCode="Rin2" pluginCode="Tx2k" cppLanguageStandard="20">
+  <MAINGROUP id="XkPuv5" name="TX2000W">
+    <GROUP id="seqGroup" name="R2JUCE MIDI Player">
+      <FILE id="seq6" name="SequencePlayer.h" compile="0" resource="0" file="Source/Sequence/SequencePlayer.h"/>
+      <FILE id="r2seq1" name="R2SequenceFile.cpp" compile="1" resource="0"
+            file="../third_party/R2JUCE/modules/R2JUCE/src/R2SequenceFile.cpp"/>
+      <FILE id="r2seq2" name="R2RcpFile.cpp" compile="1" resource="0" file="../third_party/R2JUCE/modules/R2JUCE/src/R2RcpFile.cpp"/>
+      <FILE id="r2seq3" name="R2WrdFile.cpp" compile="1" resource="0" file="../third_party/R2JUCE/modules/R2JUCE/src/R2WrdFile.cpp"/>
+      <FILE id="r2seq4" name="R2SequencePlayer.h" compile="0" resource="0"
+            file="../third_party/R2JUCE/modules/R2JUCE/src/R2SequencePlayer.h"/>
+    </GROUP>
+    <GROUP id="nativeCore" name="Synth Engine">
+      <FILE id="nativeEngine" name="engine.h" compile="0" resource="0" file="../src/native/engine.h"/>
+      <FILE id="nativePanel" name="panel.h" compile="0" resource="0" file="../src/native/panel.h"/>
+      <FILE id="nativePanelFx" name="panel_fx_tables.h" compile="0" resource="0"
+            file="../src/native/panel_fx_tables.h"/>
+      <FILE id="appGrpRoms" name="AppGroupRoms.mm" compile="1" resource="0"
+            file="Source/AppGroupRoms.mm"/>
+      <FILE id="synthBridge" name="SynthEngine.cpp" compile="1" resource="0"
+            file="Source/SynthEngine.cpp"/>
+      <FILE id="synthHeader" name="SynthEngine.h" compile="0" resource="0"
+            file="Source/SynthEngine.h"/>
+      <FILE id="displaySnapshot" name="PanelSnapshot.h" compile="0" resource="0"
+            file="Source/PanelSnapshot.h"/>
+    </GROUP>
+    <GROUP id="{EE852A80-A8CF-6A8F-60B1-E30D38B313DC}" name="Source">
+      <FILE id="RkEnc01" name="PanelEncoder.h" compile="0" resource="0" file="Source/PanelEncoder.h"/>
+      <FILE id="icfpNr" name="PluginProcessor.cpp" compile="1" resource="0"
+            file="Source/PluginProcessor.cpp"/>
+      <FILE id="SQDAt0" name="PluginProcessor.h" compile="0" resource="0"
+            file="Source/PluginProcessor.h"/>
+      <FILE id="RgXkUi" name="PluginEditor.cpp" compile="1" resource="0"
+            file="Source/PluginEditor.cpp"/>
+      <FILE id="fjCOLD" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+      <FILE id="zL8qMa" name="MainComponent.cpp" compile="1" resource="0"
+            file="Source/MainComponent.cpp"/>
+      <FILE id="BDt0Ec" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
+      <FILE id="AuSetC" name="AudioSettingsScreen.cpp" compile="1" resource="0"
+            file="Source/AudioSettingsScreen.cpp"/>
+      <FILE id="AuSetH" name="AudioSettingsScreen.h" compile="0" resource="0"
+            file="Source/AudioSettingsScreen.h"/>
+      <FILE id="GUnn4r" name="SettingsComponent.cpp" compile="1" resource="0"
+            file="Source/SettingsComponent.cpp"/>
+      <FILE id="RBcCn8" name="SettingsComponent.h" compile="0" resource="0"
+            file="Source/SettingsComponent.h"/>
+      <FILE id="origPanel" name="OriginalPanel.h" compile="0" resource="0"
+            file="Source/OriginalPanel.h"/>
+    </GROUP>
+    <GROUP id="{E5B87B9D-9BEF-C4CC-20BA-620CFB2C3AF3}" name="Images">
+      <FILE id="Jn1tgE" name="Icon.png" compile="0" resource="1" file="Images/Icon.png"/>
+      <FILE id="LYcpKb" name="Rack.png" compile="0" resource="1" file="Images/Rack.png"/>
+      <FILE id="UBMU83" name="Power_down.png" compile="0" resource="1" file="Images/Power_down.png"/>
+      <FILE id="NBnfFf" name="Power_normal.png" compile="0" resource="1"
+            file="Images/Power_normal.png"/>
+      <FILE id="fjmOZ6" name="Power_over.png" compile="0" resource="1" file="Images/Power_over.png"/>
+      <FILE id="bOAAiG" name="Knob.png" compile="0" resource="1" file="Images/Knob.png"/>
+      <FILE id="B1L3l7" name="Button_Down.png" compile="0" resource="1" file="Images/Button_Down.png"/>
+      <FILE id="DucQhl" name="Button_Normal.png" compile="0" resource="1"
+            file="Images/Button_Normal.png"/>
+      <FILE id="L7XuBa" name="Button_Over.png" compile="0" resource="1" file="Images/Button_Over.png"/>
+      <FILE id="DnGvqh" name="TX2000W.png" compile="0" resource="1" file="Images/TX2000W.png"/>
+      <FILE id="zXUv00" name="LedButtonOn_Over.png" compile="0" resource="1"
+            file="Images/LedButtonOn_Over.png"/>
+      <FILE id="OyMyWk" name="LedButtonOn_Normal.png" compile="0" resource="1"
+            file="Images/LedButtonOn_Normal.png"/>
+      <FILE id="ganA98" name="LedButtonOn_Down.png" compile="0" resource="1"
+            file="Images/LedButtonOn_Down.png"/>
+      <FILE id="JwZ0fO" name="LedButtonOff_Over.png" compile="0" resource="1"
+            file="Images/LedButtonOff_Over.png"/>
+      <FILE id="ko9jXK" name="LedButtonOff_Normal.png" compile="0" resource="1"
+            file="Images/LedButtonOff_Normal.png"/>
+      <FILE id="J4Iix9" name="LedButtonOff_Down.png" compile="0" resource="1"
+            file="Images/LedButtonOff_Down.png"/>
+      <FILE id="NhUeZY" name="Dial.png" compile="0" resource="1" file="Images/Dial.png"/>
+      <FILE id="mameBg02" name="mu2000-mame@2x.png" compile="0" resource="1"
+            file="Images/mu2000-mame@2x.png"/>
+      <FILE id="part01" name="btn@2x.png" compile="0" resource="1" file="Images/btn@2x.png"/>
+      <FILE id="part02" name="btn-on@2x.png" compile="0" resource="1" file="Images/btn-on@2x.png"/>
+      <FILE id="part03" name="btn-down@2x.png" compile="0" resource="1" file="Images/btn-down@2x.png"/>
+      <FILE id="part04" name="cat@2x.png" compile="0" resource="1" file="Images/cat@2x.png"/>
+      <FILE id="part05" name="cat-down@2x.png" compile="0" resource="1" file="Images/cat-down@2x.png"/>
+      <FILE id="part06" name="key@2x.png" compile="0" resource="1" file="Images/key@2x.png"/>
+      <FILE id="part07" name="key-down@2x.png" compile="0" resource="1" file="Images/key-down@2x.png"/>
+      <FILE id="part08" name="rnd@2x.png" compile="0" resource="1" file="Images/rnd@2x.png"/>
+      <FILE id="part09" name="rnd-down@2x.png" compile="0" resource="1" file="Images/rnd-down@2x.png"/>
+      <FILE id="part10" name="plg@2x.png" compile="0" resource="1" file="Images/plg@2x.png"/>
+      <FILE id="part11" name="plg-on@2x.png" compile="0" resource="1" file="Images/plg-on@2x.png"/>
+      <FILE id="part12" name="knob@2x.png" compile="0" resource="1" file="Images/knob@2x.png"/>
+      <FILE id="part13" name="dial@2x.png" compile="0" resource="1" file="Images/dial@2x.png"/>
+      <FILE id="panelData" name="panel.txt" compile="0" resource="1" file="../art/mame/panel.txt"/>
+      <FILE id="panelFix" name="panel-corrections.txt" compile="0" resource="1"
+            file="Images/panel-corrections.txt"/>
+    </GROUP>
+    <GROUP id="{7E69AA55-6EF7-4824-A7CD-5A768772717F}" name="Fonts"/>
+  </MAINGROUP>
+  <MODULES>
+    <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_audio_plugin_client" showAllCode="1" useLocalCopy="0"
+            useGlobalPath="0"/>
+    <MODULE id="juce_audio_processors" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_audio_processors_headless" showAllCode="1" useLocalCopy="0"
+            useGlobalPath="0"/>
+    <MODULE id="juce_audio_utils" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_core" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_events" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+  </MODULES>
+  <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>
+  <EXPORTFORMATS>
+    <XCODE_MAC targetFolder="Builds/MacOSX" iosDevelopmentTeamID="P5G28RMWUN"
+               extraCompilerFlags="-fdelayed-template-parsing" applicationCategory="public.app-category.music"
+               appSandbox="1" appSandboxOptions="com.apple.security.device.audio-input,com.apple.security.device.bluetooth,com.apple.security.files.user-selected.read-write"
+               hardenedRuntime="1" hardenedRuntimeOptions="com.apple.security.device.audio-input"
+               microphonePermissionNeeded="1" microphonePermissionsText="Audio input is used for the MU2000 A/D inputs."
+               iosBluetoothPermissionNeeded="1" iosAppGroups="1" supportsOpeningDocumentsInPlace="1"
+               iosAppGroupsId="group.tokyo.studio-r.synths" smallIcon="Jn1tgE"
+               bigIcon="Jn1tgE">
+      <CONFIGURATIONS>
+        <CONFIGURATION enablePluginBinaryCopyStep="0" isDebug="1" name="Debug" optimisation="3"
+                       macOSDeploymentTarget="11.0" headerPath="../../../src&#10;../../../src/compat"
+                       targetName="TX2000W"/>
+        <CONFIGURATION enablePluginBinaryCopyStep="0" isDebug="0" name="Release" optimisation="3"
+                       macOSDeploymentTarget="11.0" headerPath="../../../src&#10;../../../src/compat"
+                       targetName="TX2000W"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_audio_basics" path="../third_party/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../third_party/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../third_party/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../third_party/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../third_party/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors_headless" path="../third_party/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../third_party/JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../third_party/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../third_party/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../third_party/JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../third_party/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../third_party/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../third_party/JUCE/modules"/>
+      </MODULEPATHS>
+    </XCODE_MAC>
+    <VS2026 targetFolder="Builds/VisualStudio2026" extraCompilerFlags="/utf-8 /bigobj /FC"
+            smallIcon="Jn1tgE" bigIcon="Jn1tgE">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug" headerPath="../../../src&#10;../../../src/compat"
+                       targetName="TX2000W" winArchitecture="ARM64,x64" fastMath="1"/>
+        <CONFIGURATION isDebug="0" name="Release" headerPath="../../../src&#10;../../../src/compat"
+                       targetName="TX2000W" winArchitecture="ARM64,x64" fastMath="1"
+                       linkTimeOptimisation="0" useRuntimeLibDLL="0"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_audio_basics" path="../third_party/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../third_party/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../third_party/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../third_party/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../third_party/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors_headless" path="../third_party/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../third_party/JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../third_party/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../third_party/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../third_party/JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../third_party/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../third_party/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../third_party/JUCE/modules"/>
+      </MODULEPATHS>
+    </VS2026>
+    <XCODE_IPHONE targetFolder="Builds/iOS" smallIcon="Jn1tgE" bigIcon="Jn1tgE"
+                  iosScreenOrientation="UIInterfaceOrientationLandscapeLeft,UIInterfaceOrientationLandscapeRight,UIInterfaceOrientationPortrait,UIInterfaceOrientationPortraitUpsideDown"
+                  iPadScreenOrientation="UIInterfaceOrientationLandscapeLeft,UIInterfaceOrientationLandscapeRight,UIInterfaceOrientationPortrait,UIInterfaceOrientationPortraitUpsideDown"
+                  UIFileSharingEnabled="1" UISupportsDocumentBrowser="1" microphonePermissionNeeded="1"
+                  iosBluetoothPermissionNeeded="1" iosContentSharing="1" iosBackgroundAudio="1"
+                  iosBackgroundBle="1" iosAppGroups="1" supportsOpeningDocumentsInPlace="1"
+                  iosDevelopmentTeamID="P5G28RMWUN" iosAppGroupsId="group.tokyo.studio-r.synths"
+                  extraCompilerFlags="-fdelayed-template-parsing">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug" iosDeploymentTarget="15" iosCompatibility="15"
+                       headerPath="../../../src&#10;../../../src/compat"/>
+        <CONFIGURATION isDebug="0" name="Release" iosDeploymentTarget="15" iosCompatibility="15"
+                       headerPath="../../../src&#10;../../../src/compat"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_audio_basics" path="../third_party/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../third_party/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../third_party/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../third_party/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../third_party/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors_headless" path="../third_party/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../third_party/JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../third_party/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../third_party/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../third_party/JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../third_party/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../third_party/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../third_party/JUCE/modules"/>
+      </MODULEPATHS>
+    </XCODE_IPHONE>
+  </EXPORTFORMATS>
+</JUCERPROJECT>

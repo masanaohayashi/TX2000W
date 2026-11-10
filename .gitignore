@@ -1,0 +1,10 @@
+.DS_Store
+build/
+/juce/Builds/
+/juce/JuceLibraryCode/
+/roms/
+/manual/
+*.obj
+/dist/
+/scripts/macos/config.env
+/doc/

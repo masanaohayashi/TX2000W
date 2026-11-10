@@ -1,0 +1,7 @@
+# Corrections to the approximate knob positions emitted by tools/lay2panel.py.
+# Centres measured from the unchanged MAME SVG paths, transformed with
+# K = 385 / 179.91666; OX = (1000 - 433.91666 * K) / 2.
+# The background PNG masks only the old fixed outlines at these centres.
+# Radius includes the transparent margin of the original parts PNG.
+volume 193.5 159.8 28.5
+dial 863.2 262.0 68.5

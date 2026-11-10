@@ -1,0 +1,72 @@
+TX2000W
+Copyright (C) 2026 Masanao Takeuchi
+
+This program is free software: you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your option)
+any later version. See LICENSE for the full text.
+
+--------------------------------------------------------------------------
+S-MU2000
+--------------------------------------------------------------------------
+
+TX2000W is based on S-MU2000 (https://github.com/tarboh/S-MU2000).
+Portions taken from it keep their original licence:
+
+  Copyright (c) 2026, tarboh and the S-MU2000 contributors
+  BSD 3-Clause License (same terms as the MAME text below).
+
+--------------------------------------------------------------------------
+Third-party components (git submodules, not part of this source tree)
+--------------------------------------------------------------------------
+
+JUCE  --  third_party/JUCE
+https://github.com/juce-framework/JUCE
+Dual licensed: AGPLv3 or the JUCE commercial licence. Distributing a build
+requires complying with one of them.
+
+R2JUCE  --  third_party/R2JUCE
+https://github.com/masanaohayashi/R2JUCE
+
+--------------------------------------------------------------------------
+MAME
+--------------------------------------------------------------------------
+
+The wave decoding and envelope stepping in src/native/voice_bank.h follow the
+SWP30 device in MAME (https://github.com/mamedev/mame).
+Copyright (c) Olivier Galibert. BSD 3-Clause License:
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are
+  met:
+
+  1. Redistributions of source code must retain the above copyright notice,
+     this list of conditions and the following disclaimer.
+  2. Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+  3. Neither the name of the copyright holder nor the names of its
+     contributors may be used to endorse or promote products derived from
+     this software without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+  IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------------
+Not included
+--------------------------------------------------------------------------
+
+No Yamaha ROM data is included: not the program ROM, not the wave ROMs, not
+the LCD character generator. Users supply them from their own hardware.
+
+Yamaha, MU2000 and XG are trademarks of Yamaha Corporation. This project is
+not affiliated with, endorsed by, or supported by Yamaha.
