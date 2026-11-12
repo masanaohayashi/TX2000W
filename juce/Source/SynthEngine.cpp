@@ -2,6 +2,7 @@
 #include "compat/platform.h"
 #include "native/panel.h"
 #include "roms_dir.h"
+#include "MinimumPhaseSRC.hpp"
 #include <thread>
 #include <mutex>
 #include <chrono>
@@ -104,26 +105,12 @@ struct SynthEngine::Impl
     juce::SmoothedValue<float> inputLevel;
     // Scratch for one chunk: no allocation on the audio thread.
     std::array<float,MAX_CHUNK> adLeft{},adRight{},renderLeft{},renderRight{};
-    // Conversion from other host rates. The 256-frame history holds the 64 filter taps
-    // plus the frames rendered ahead for one chunk.
-    static constexpr int RING=256, TAPS_HALF=32, MAX_AHEAD=RING-2*TAPS_HALF;
-    std::array<float,RING> nativeLeft{},nativeRight{},nativeInputLeft{},nativeInputRight{};
-    std::array<double,TAPS_HALF*256+2> sinc{};
-    int64_t written=0;
-    double position=0;
+    // Conversion to other host rates: the minimum-phase polyphase FIR shared with SQR
+    // (MinimumPhaseSRC.hpp). prepare() builds the kernel and reserves the history, so the
+    // audio thread never allocates. Minimum phase, so no latency to report.
+    patchsrc::MinimumPhaseStream src;
+    std::array<float,MAX_CHUNK> nativeInputLeft{},nativeInputRight{};
     float previousInput[2]{};
-
-    Impl()
-    {
-        for (size_t k = 0; k < sinc.size(); ++k)
-        {
-            const double d = double(k) / 256, t = (d + 32) / 64;
-            sinc[k] = (k == 0 ? 1 : std::sin(juce::MathConstants<double>::pi*d)
-                / (juce::MathConstants<double>::pi*d))
-                * (0.42 - 0.5*std::cos(2*juce::MathConstants<double>::pi*t)
-                   + 0.08*std::cos(4*juce::MathConstants<double>::pi*t));
-        }
-    }
 
     bool convertsRate() const { return std::abs(rate-NATIVE_RATE) >= 0.001; }
 
@@ -131,22 +118,22 @@ struct SynthEngine::Impl
     void renderChunk(int n, const float* adL, const float* adR, float* left, float* right)
     {
         if (!convertsRate()) { machine->render(left,right,n,adL,adR); return; }
-        const double step=double(NATIVE_RATE)/rate;
         const double perNative=rate/NATIVE_RATE;
+        // Host frames per pass, so one pass never needs more than MAX_CHUNK native frames.
+        const int pass=std::max(1,int(double(MAX_CHUNK-3)/src.step));
         int done=0;
         while (done<n)
         {
-            // Render ahead what the next stretch of output needs, in one call, so the engine
-            // still works in blocks when the host runs at another rate.
-            const int stretch=std::min(n-done,std::max(1,int(double(MAX_AHEAD)/step)-1));
-            const auto lastCentre=int64_t(std::floor(position+double(stretch-1)*step))-TAPS_HALF;
-            const auto needed=int(std::clamp<int64_t>(lastCentre+TAPS_HALF+1-written,0,MAX_AHEAD));
+            // Render only the native frames this pass reads (the last output's, +1), in one call.
+            const int stretch=std::min(n-done,pass);
+            const auto need=size_t(src.pos+double(stretch-1)*src.step)+2;
+            const int needed=need>src.frames()?int(std::min<size_t>(need-src.frames(),MAX_CHUNK)):0;
             if (needed>0)
             {
                 // Input at the native sample times, between the host samples around them.
                 for (int i=0;i<needed;++i)
                 {
-                    const double host=double(done)+(double(written+i)-position)*perNative;
+                    const double host=double(done)+(double(src.frames()+size_t(i))-src.pos)*perNative;
                     const auto at=[&](const float* p,float before,double x) {
                         if (x<=-1) return before;
                         const int i0=int(std::floor(x));
@@ -158,39 +145,15 @@ struct SynthEngine::Impl
                     nativeInputRight[size_t(i)]=at(adR,previousInput[1],host);
                 }
                 machine->render(renderLeft.data(),renderRight.data(),needed,nativeInputLeft.data(),nativeInputRight.data());
-                for (int i=0;i<needed;++i)
-                {
-                    nativeLeft[size_t(written+i)&(RING-1)]=renderLeft[size_t(i)];
-                    nativeRight[size_t(written+i)&(RING-1)]=renderRight[size_t(i)];
-                }
-                written+=needed;
+                for (int i=0;i<needed;++i) src.push(renderLeft[size_t(i)],renderRight[size_t(i)]);
             }
-            const double cutoff=std::min(1.0,rate/NATIVE_RATE)*0.955;
             for (int s=0;s<stretch;++s)
             {
-                const auto centre=int64_t(std::floor(position))-TAPS_HALF;
-                double l=0,r=0,weight=0;
-                for (int k=-31;k<=32;++k)
-                {
-                    const auto idx=centre+k;
-                    const double fx=std::abs((position-TAPS_HALF-double(idx))*cutoff)*256;
-                    const size_t j=size_t(fx);
-                    if (j+1>=sinc.size()) continue;
-                    const double h=sinc[j]+(sinc[j+1]-sinc[j])*(fx-double(j));
-                    l+=nativeLeft[size_t(idx)&(RING-1)]*h;
-                    r+=nativeRight[size_t(idx)&(RING-1)]*h;
-                    weight+=h;
-                }
-                left[done+s]=float(l/weight);
-                right[done+s]=float(r/weight);
-                position+=step;
+                left[done+s]=right[done+s]=0;
+                src.next(left[done+s],right[done+s]);
             }
+            src.trim();
             done+=stretch;
-            if (position>(1<<28))
-            {
-                const auto base=(int64_t(position)-TAPS_HALF)&~int64_t(RING-1);
-                position-=double(base);written-=base;
-            }
         }
         previousInput[0]=adL[n-1];
         previousInput[1]=adR[n-1];
@@ -203,7 +166,7 @@ struct SynthEngine::Impl
         viewWrite.store(w+1,std::memory_order_release);
     }
     void resetHistory() {
-        nativeLeft.fill(0);nativeRight.fill(0);written=0;position=0;
+        src.buf.assign(src.hist*2,0.f);src.pos=double(src.hist); // silence history, within the reserve
         previousInput[0]=previousInput[1]=0;
         inputLevel.reset(rate,0.02);inputLevel.setCurrentAndTargetValue(0);
         oldButtons=0;buttons.store(0);encoder.store(0);
@@ -249,7 +212,8 @@ void SynthEngine::prepare(double rate,int)
     Impl::Maintenance access(*impl);
     impl->ready.store(false);
     impl->rate=std::isfinite(rate) && rate>=8000 && rate<=384000 ? rate:NATIVE_RATE;
-    impl->latency=!impl->convertsRate() ? 0:int(std::ceil(32*impl->rate/NATIVE_RATE));
+    impl->latency=0; // minimum phase: nothing for the host to compensate
+    impl->src.prepare(NATIVE_RATE,impl->rate,MAX_CHUNK+8); // builds the kernel (tens of ms)
     if(!impl->machine && !impl->initialise()) return;
     if(impl->pending.getSize()!=0) impl->applyPending();
     impl->machine->discard_sound();
