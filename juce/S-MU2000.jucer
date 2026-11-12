@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="pCpVsR" name="TX2000W" projectType="audioplug" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" version="0.3.2"
+              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" version="0.3.3"
               bundleIdentifier="tokyo.studio-r.tx2000w" pluginFormats="buildAUv3,buildStandalone,buildVST3"
               companyName="STUDIO-R" companyCopyright="2026 STUDIO-R" companyWebsite="http://studio-r.tokyo"
               pluginCharacteristicsValue="pluginIsSynth,pluginProducesMidiOut,pluginWantsMidiIn"
