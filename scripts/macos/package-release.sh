@@ -2,6 +2,14 @@
 # Build, sign, notarize and staple the TX2000W macOS package, and optionally
 # publish it as a GitHub Release.
 #
+# The app and its AUv3 extension use the App Group group.tokyo.studio-r.synths.
+# macOS lets a Developer ID app use a "group." App Group only with a Developer ID
+# provisioning profile that grants it (otherwise every launch asks the user), so
+# the app is exported by Xcode as Developer ID with automatic signing: Xcode
+# makes (or reuses) the two "Mac Team Direct" profiles for the App IDs
+# tokyo.studio-r.tx2000w and tokyo.studio-r.tx2000w.tx2000wAUv3, valid for 18 years,
+# embeds them and signs. The App IDs must have the App Group assigned.
+#
 # The generated DMG contains:
 #   TX2000W.app            standalone app, with the AUv3 extension inside
 #   Applications        -> /Applications
@@ -41,8 +49,6 @@ ALLOW_DIRTY=0
 PRODUCT="TX2000W"
 source "${SCRIPT_DIR}/../common.sh"
 XCODE_PROJECT="${MACOS_PROJECT_DIR}/${PRODUCT}.xcodeproj"
-APP_ENTITLEMENTS="${MACOS_PROJECT_DIR}/Standalone_Plugin.entitlements"
-APPEX_ENTITLEMENTS="${MACOS_PROJECT_DIR}/AUv3_AppExtension.entitlements"
 
 usage() {
   cat <<'EOF'
@@ -71,6 +77,7 @@ Options:
 The following environment variables can also be set in scripts/macos/config.env:
   APP_IDENTITY, TEAM_ID, NOTARY_PROFILE, BUILD_CONFIGURATION,
   BUILD_ARCHS, RELEASE_BRANCH, RELEASE_REMOTE, GH_REPO, PROJUCER
+
 EOF
 }
 
@@ -105,20 +112,8 @@ check_signing_identity() {
   esac
 }
 
-prepare_entitlements() {
-  local source="$1"
-  local destination="$2"
-
-  [[ -f "$source" ]] || die "missing entitlements file: $source"
-  # Projucer-generated entitlements may use CRLF line endings. Normalize a
-  # temporary copy because codesign's AMFI parser rejects that XML on macOS.
-  plutil -convert xml1 -o "$destination" "$source" \
-    || die "could not normalize entitlements: $source"
-  [[ -s "$destination" ]] || die "normalized entitlements are empty: $destination"
-}
-
-# Unsigned universal build settings shared by the archive and the VST3 build.
-# The final Developer ID signatures are applied after all binary transformations.
+# Unsigned universal build settings for the VST3 build; it is signed with
+# Developer ID afterwards. (The app is signed by Xcode's export.)
 set_xcode_settings() {
   XCODE_SETTINGS=(
     ONLY_ACTIVE_ARCH=NO
@@ -143,10 +138,28 @@ check_universal() {
   done
 }
 
+# Every App Group the bundle's signature asks for must be granted by its embedded Developer ID profile, or macOS
+# asks the user at every launch.
+check_profile() {
+  local bundle="$1" profile decoded wanted group
+  profile="$bundle/Contents/embedded.provisionprofile"
+  [[ -f "$profile" ]] || die "no provisioning profile embedded in $bundle"
+  decoded="$(security cms -D -i "$profile" 2>/dev/null)" || die "could not read $profile"
+  [[ "$(plutil -extract ProvisionsAllDevices raw -o - - <<<"$decoded" 2>/dev/null)" == "true" ]] \
+    || die "not a Developer ID provisioning profile: $profile"
+  wanted="$(codesign -d --entitlements - --xml "$bundle" 2>/dev/null \
+    | plutil -extract com\\.apple\\.security\\.application-groups json -o - - 2>/dev/null || true)"
+  for group in $(tr -d '[]"' <<<"$wanted" | tr ',' ' '); do
+    plutil -extract Entitlements.com\\.apple\\.security\\.application-groups json -o - - <<<"$decoded" \
+      | grep -q "\"${group}\"" || die "the profile in $bundle does not grant App Group ${group}"
+  done
+  log "$(basename "$bundle"): $(plutil -extract Name raw -o - - <<<"$decoded"), until $(plutil -extract ExpirationDate raw -o - - <<<"$decoded")"
+}
+
 archive_app() {
   local archive_log="$WORK_DIR/xcodebuild-archive.log"
-  local normalized_appex_entitlements="$WORK_DIR/AUv3_AppExtension.entitlements"
-  local normalized_app_entitlements="$WORK_DIR/Standalone_Plugin.entitlements"
+  local export_log="$WORK_DIR/xcodebuild-export.log"
+  local export_options="$WORK_DIR/ExportOptions.plist"
 
   log "Archiving ${PRODUCT} - Standalone Plugin (${BUILD_CONFIGURATION}, ${BUILD_ARCHS})"
   if ! xcodebuild archive \
@@ -155,32 +168,43 @@ archive_app() {
     -configuration "$BUILD_CONFIGURATION" \
     -destination "generic/platform=macOS" \
     -archivePath "$ARCHIVE_PATH" \
-    "${XCODE_SETTINGS[@]}" \
+    -allowProvisioningUpdates \
+    ONLY_ACTIVE_ARCH=NO "ARCHS=$BUILD_ARCHS" "VALID_ARCHS=$BUILD_ARCHS" \
+    "DEVELOPMENT_TEAM=$TEAM_ID" CODE_SIGN_STYLE=Automatic \
     2>&1 | tee "$archive_log" >/dev/null; then
     die "xcodebuild archive failed; see $archive_log"
   fi
 
-  [[ -d "$APP_PATH" ]] || die "archive did not produce: $APP_PATH"
-  [[ -d "$APPEX_PATH" ]] || die "AUv3 app extension is missing from the archived app: $APPEX_PATH"
+  log "Exporting as Developer ID (Xcode signs and embeds the provisioning profiles)"
+  cat >"$export_options" <<EOF_OPTIONS
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>method</key><string>developer-id</string>
+  <key>signingStyle</key><string>automatic</string>
+  <key>teamID</key><string>${TEAM_ID}</string>
+  <key>destination</key><string>export</string>
+</dict>
+</plist>
+EOF_OPTIONS
+  if ! xcodebuild -exportArchive \
+    -archivePath "$ARCHIVE_PATH" \
+    -exportPath "$EXPORT_DIR" \
+    -exportOptionsPlist "$export_options" \
+    -allowProvisioningUpdates \
+    2>&1 | tee "$export_log" >/dev/null; then
+    die "xcodebuild -exportArchive failed; see $export_log"
+  fi
+
+  [[ -d "$APP_PATH" ]] || die "export did not produce: $APP_PATH"
+  [[ -d "$APPEX_PATH" ]] || die "AUv3 app extension is missing from the exported app: $APPEX_PATH"
   check_universal "$APP_PATH/Contents/MacOS/${PRODUCT}"
   check_universal "$APPEX_PATH/Contents/MacOS/${PRODUCT}"
+  check_profile "$APPEX_PATH"
+  check_profile "$APP_PATH"
 
-  prepare_entitlements "$APPEX_ENTITLEMENTS" "$normalized_appex_entitlements"
-  prepare_entitlements "$APP_ENTITLEMENTS" "$normalized_app_entitlements"
-
-  log "Applying final Developer ID signatures (AUv3, then app)"
-  codesign --force --sign "$APP_IDENTITY" \
-    --verbose=4 --timestamp --options runtime \
-    --entitlements "$normalized_appex_entitlements" \
-    --generate-entitlement-der \
-    "$APPEX_PATH"
-  codesign --force --sign "$APP_IDENTITY" \
-    --verbose=4 --timestamp --options runtime \
-    --entitlements "$normalized_app_entitlements" \
-    --generate-entitlement-der \
-    "$APP_PATH"
-
-  log "Verifying Developer ID signature on the archived app"
+  log "Verifying Developer ID signature on the exported app"
   codesign --verify --deep --strict --verbose=2 "$APP_PATH"
   # Captured first: `codesign | grep -q` fails under pipefail when grep exits early
   local signature_info
@@ -188,7 +212,7 @@ archive_app() {
     || die "codesign display failed"
   case "$signature_info" in
     *"$APP_IDENTITY"*) ;;
-    *) die "archived app is not signed with: $APP_IDENTITY" ;;
+    *) die "exported app is not signed with: $APP_IDENTITY" ;;
   esac
 }
 
@@ -357,7 +381,8 @@ main() {
 
   WORK_DIR="${DIST_DIR}/work/${RELEASE_TAG}/macos"
   ARCHIVE_PATH="${WORK_DIR}/${PRODUCT}.xcarchive"
-  APP_PATH="${ARCHIVE_PATH}/Products/Applications/${PRODUCT}.app"
+  EXPORT_DIR="${WORK_DIR}/export"
+  APP_PATH="${EXPORT_DIR}/${PRODUCT}.app"
   APPEX_PATH="${APP_PATH}/Contents/PlugIns/${PRODUCT}.appex"
   VST3_PATH="${WORK_DIR}/${PRODUCT}.vst3"
   DMG_STAGE="${WORK_DIR}/dmg-root"
